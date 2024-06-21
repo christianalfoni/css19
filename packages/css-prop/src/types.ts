@@ -9,14 +9,16 @@ type AtRules =
 
 type AtRuleString = `${AtRules} ${string}`;
 
-type Selectors = "&" | "#" | "." | "[" | ":" | "::" | ">" | "+" | "~" | "*";
+type Selectors = "&" | "#" | "." | "[" | ":" | ">" | "+" | "~" | "*";
 
-type HTMLTagNames = keyof JSX.IntrinsicElements;
+type HTMLTagNames = Exclude<keyof JSX.IntrinsicElements, "filter">;
 
 type SelectorString = `${Selectors}${string}`;
 
-export type CSSProp = React.CSSProperties & {
+export type CSSProp = Omit<React.CSSProperties, "filter"> & {
   [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProp;
+} & {
+  filter?: React.CSSProperties["filter"] | CSSProp;
 };
 
 export declare namespace CSSPropJSX {
