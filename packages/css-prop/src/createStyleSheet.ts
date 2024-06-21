@@ -25,7 +25,10 @@ export function createStyleSheet(hash: string, css: CSSProps, isRoot = false) {
       styleSheet += `.${hash} {\n`;
     }
 
-    styleSheet += `  ${rule}: ${css[rule as keyof CSSProps]};\n`;
+    styleSheet += `  ${rule.replace(
+      /[A-Z]/g,
+      (match) => "-" + match.toLowerCase()
+    )}: ${css[rule as keyof CSSProps]};\n`;
   }
 
   if (styleSheet && isRoot) {
