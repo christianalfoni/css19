@@ -8,7 +8,7 @@ export const Fragment = ReactJSXRuntime.Fragment;
 
 export function jsx(type: any, props: Record<string, any>, key: string) {
   if (props.css) {
-    const cssHash = hash(props.css);
+    const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>
         React.createElement("style", {
@@ -42,7 +42,7 @@ export function jsx(type: any, props: Record<string, any>, key: string) {
 
 export function jsxs(type: any, props: Record<string, any>, key: string) {
   if (props.css) {
-    const cssHash = hash(props.css);
+    const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>
         React.createElement("style", {

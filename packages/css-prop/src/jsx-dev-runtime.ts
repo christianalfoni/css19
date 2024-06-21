@@ -15,7 +15,7 @@ export function jsxDEV(
   self: any
 ): React.JSX.Element {
   if (props.css) {
-    const cssHash = hash(props.css);
+    const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>
         React.createElement("style", {
