@@ -1,0 +1,42 @@
+{
+  "name": "@css19/css-prop",
+  "version": "0.1.2",
+  "description": "CSS19 - React CSS prop",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christianalfoni/css19.git"
+  },
+  "keywords": [
+    "react",
+    "css",
+    "prop",
+    "style"
+  ],
+  "author": "Christian Alfoni",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/christianalfoni/css19/issues"
+  },
+  "homepage": "https://github.com/christianalfoni/css19#readme",
+  "devDependencies": {
+    "@types/hash-sum": "^1.0.2",
+    "@types/react": "^18.3.3",
+    "react": "^18.3.1",
+    "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "hash-sum": "^2.0.0"
+  },
+  "files": [
+    "dist",
+    "jsx-runtime",
+    "jsx-dev-runtime"
+  ]
+}

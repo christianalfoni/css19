@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "es2019",
+    "declaration": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}
