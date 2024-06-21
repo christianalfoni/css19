@@ -1,7 +1,7 @@
 import * as React from "react";
 import ReactJSXRuntime from "react/jsx-runtime";
 import hash from "hash-sum";
-import { createStyleSheet } from "./createStyleSheet";
+import { createStyleSheet } from "./createStyleSheet.js";
 export type { CSSPropJSX as JSX } from "./types";
 
 export const Fragment = ReactJSXRuntime.Fragment;
