@@ -1,6 +1,6 @@
-import { CSSProps } from "./types";
+import { CSSProp } from "./types";
 
-export function createStyleSheet(hash: string, css: CSSProps, isRoot = false) {
+export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
   let styleSheet = "";
   let nested = "";
 
@@ -8,15 +8,15 @@ export function createStyleSheet(hash: string, css: CSSProps, isRoot = false) {
     if (rule[0] === "@") {
       nested += `\n${rule} {\n  .${hash} {\n  ${createStyleSheet(
         hash,
-        css[rule as keyof CSSProps] as CSSProps
+        css[rule as keyof CSSProp] as CSSProp
       )}  }\n}`;
       continue;
     }
 
-    if (typeof css[rule as keyof CSSProps] === "object") {
+    if (typeof css[rule as keyof CSSProp] === "object") {
       nested += `\n.${hash}${rule} {\n${createStyleSheet(
         hash,
-        css[rule as keyof CSSProps] as CSSProps
+        css[rule as keyof CSSProp] as CSSProp
       )}}`;
       continue;
     }
@@ -28,7 +28,7 @@ export function createStyleSheet(hash: string, css: CSSProps, isRoot = false) {
     styleSheet += `  ${rule.replace(
       /[A-Z]/g,
       (match) => "-" + match.toLowerCase()
-    )}: ${css[rule as keyof CSSProps]};\n`;
+    )}: ${css[rule as keyof CSSProp]};\n`;
   }
 
   if (styleSheet && isRoot) {

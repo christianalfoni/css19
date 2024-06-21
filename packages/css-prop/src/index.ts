@@ -1,1 +1,1 @@
-export { CSSPropJSX as CSSProp } from "./types";
+export { CSSProp } from "./types";

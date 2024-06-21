@@ -15,8 +15,8 @@ type HTMLTagNames = keyof JSX.IntrinsicElements;
 
 type SelectorString = `${Selectors}${string}`;
 
-export type CSSProps = React.CSSProperties & {
-  [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProps;
+export type CSSProp = React.CSSProperties & {
+  [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProp;
 };
 
 export declare namespace CSSPropJSX {
@@ -32,7 +32,7 @@ export declare namespace CSSPropJSX {
     React.JSX.IntrinsicClassAttributes<T>;
   export type IntrinsicElements = {
     [K in keyof JSX.IntrinsicElements]: React.JSX.IntrinsicElements[K] & {
-      css?: CSSProps;
+      css?: CSSProp;
     };
   };
 }
