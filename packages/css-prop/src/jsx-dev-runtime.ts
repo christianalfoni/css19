@@ -16,13 +16,14 @@ export function jsxDEV(
 ): React.JSX.Element {
   if (props.css && typeof type === "string") {
     const cssHash = hash(props.css);
-    const style = React.createElement("style", {
-      href: cssHash,
-      precedence: "low",
-      dangerouslySetInnerHTML: {
-        __html: createStyleSheet(`css-${cssHash}`, props.css, true),
+    const style = React.createElement(
+      "style",
+      {
+        href: cssHash,
+        precedence: "low",
       },
-    });
+      createStyleSheet(`css-${cssHash}`, props.css, true)
+    );
 
     return ReactJSXRuntimeDev.jsxDEV(
       Fragment,

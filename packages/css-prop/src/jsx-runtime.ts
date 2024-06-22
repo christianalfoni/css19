@@ -54,13 +54,14 @@ export function jsxs(type: any, props: Record<string, any>, key: string) {
     const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>
-        React.createElement("style", {
-          href: cssHash,
-          precedence: "low",
-          dangerouslySetInnerHTML: {
-            __html: createStyleSheet(`css-${cssHash}`, props.css, true),
+        React.createElement(
+          "style",
+          {
+            href: cssHash,
+            precedence: "low",
           },
-        }),
+          createStyleSheet(`css-${cssHash}`, props.css, true)
+        ),
       [cssHash]
     );
 
