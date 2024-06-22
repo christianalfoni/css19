@@ -7,7 +7,7 @@ export type { CSSPropJSX as JSX } from "./types";
 export const Fragment = ReactJSXRuntime.Fragment;
 
 export function jsx(type: any, props: Record<string, any>, key: string) {
-  if (props.css) {
+  if (props.css && typeof type === "string") {
     const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>

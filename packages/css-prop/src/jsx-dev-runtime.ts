@@ -14,7 +14,7 @@ export function jsxDEV(
   source: any,
   self: any
 ): React.JSX.Element {
-  if (props.css) {
+  if (props.css && typeof type === "string") {
     const cssHash = React.useMemo(() => hash(props.css), [props.css]);
     const style = React.useMemo(
       () =>
@@ -41,7 +41,7 @@ export function jsxDEV(
         ],
       },
       key,
-      isStaticChildren,
+      true,
       source,
       self
     );
