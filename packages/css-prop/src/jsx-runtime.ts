@@ -59,34 +59,7 @@ export function jsx(type: any, props: Record<string, any>, key: string) {
 
 export function jsxs(type: any, props: Record<string, any>, key: string) {
   if (props.css) {
-    const cssHash = React.useMemo(() => hash(props.css), [props.css]);
-    const style = React.useMemo(
-      () =>
-        React.createElement(
-          "style",
-          {
-            href: cssHash,
-            precedence: "low",
-          },
-          createStyleSheet(`css-${cssHash}`, props.css, true)
-        ),
-      [cssHash]
-    );
-
-    return ReactJSXRuntime.jsxs(
-      Fragment,
-      {
-        children: [
-          React.createElement(type, {
-            ...props,
-            className: `css-${cssHash} ${props.className || ""}`,
-            css: undefined,
-          }),
-          style,
-        ],
-      },
-      key
-    );
+    return React.createElement(CSSElement, { type, props, key });
   }
 
   return ReactJSXRuntime.jsxs(type, props, key);
