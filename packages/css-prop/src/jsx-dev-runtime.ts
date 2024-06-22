@@ -19,6 +19,7 @@ export function jsxDEV(
     const style = React.useMemo(
       () =>
         React.createElement("style", {
+          key: "css",
           href: cssHash,
           precedence: "low",
           dangerouslySetInnerHTML: {
@@ -34,6 +35,7 @@ export function jsxDEV(
         children: [
           React.createElement(type, {
             ...props,
+            key: type,
             className: `css-${cssHash} ${props.className || ""}`,
             css: undefined,
           }),
@@ -41,7 +43,7 @@ export function jsxDEV(
         ],
       },
       key,
-      true,
+      isStaticChildren,
       source,
       self
     );
