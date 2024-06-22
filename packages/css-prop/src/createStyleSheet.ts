@@ -6,6 +6,7 @@ export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
 
   for (let rule in css) {
     if (rule[0] === "@") {
+      // Media queries requires the hash classname to be nested
       nested += `\n${rule} {\n  .${hash} {\n  ${createStyleSheet(
         hash,
         css[rule as keyof CSSProp] as CSSProp
@@ -13,6 +14,7 @@ export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
       continue;
     }
 
+    // Generate the nested CSS Props
     if (typeof css[rule as keyof CSSProp] === "object") {
       nested += `\n.${hash}${rule} {\n${createStyleSheet(
         hash,
@@ -25,6 +27,7 @@ export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
       styleSheet += `.${hash} {\n`;
     }
 
+    // Convert camel case to hyphen and insert value
     styleSheet += `  ${rule.replace(
       /[A-Z]/g,
       (match) => "-" + match.toLowerCase()

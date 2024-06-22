@@ -1,12 +1,13 @@
 {
   "name": "@css19/css-prop",
-  "version": "0.1.15",
+  "version": "0.1.23",
   "description": "CSS19 - React CSS prop",
+  "main": "index.js",
+  "types": "index.d.ts",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "clean": "rm -rf ./*.js && rm -rf ./*.d.ts",
+    "build": "yarn clean && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -35,8 +36,15 @@
     "hash-sum": "^2.0.0"
   },
   "files": [
-    "dist",
-    "jsx-runtime",
-    "jsx-dev-runtime"
+    "createStyleSheet.d.ts",
+    "createStyleSheet.js",
+    "jsx-runtime.d.ts",
+    "jsx-runtime.js",
+    "jsx-dev-runtime.d.ts",
+    "jsx-dev-runtime.js",
+    "index.d.ts",
+    "index.js",
+    "types.d.ts",
+    "types.js"
   ]
 }

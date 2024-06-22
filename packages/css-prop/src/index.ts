@@ -1,1 +1,1 @@
-export { CSSProp } from "./types";
+export type { CSSProp } from "./types";
