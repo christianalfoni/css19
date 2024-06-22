@@ -32,7 +32,7 @@ export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
   }
 
   if (styleSheet && isRoot) {
-    styleSheet += "}";
+    styleSheet += "}\n";
   }
 
   return styleSheet + nested;
