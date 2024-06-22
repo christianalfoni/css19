@@ -52,7 +52,14 @@ export function createTokens<
     }
   }
 
-  const style = React.createElement("style", null, tokensString + themesString);
+  const style = React.createElement(
+    "style",
+    {
+      href: "css-tokens",
+      precedence: "low",
+    },
+    tokensString + themesString
+  );
 
   return {
     tokens: tokenVariables,
