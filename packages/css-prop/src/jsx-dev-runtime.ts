@@ -15,35 +15,36 @@ export function jsxDEV(
   self: any
 ): React.JSX.Element {
   if (props.css && typeof type === "string") {
-    const cssHash = React.useMemo(() => hash(props.css), [props.css]);
-    const style = React.useMemo(
-      () =>
-        React.createElement("style", {
-          key: "css",
-          href: cssHash,
-          precedence: "low",
-          dangerouslySetInnerHTML: {
-            __html: createStyleSheet(`css-${cssHash}`, props.css, true),
-          },
-        }),
-      [cssHash]
-    );
+    const cssHash = hash(props.css);
+    const style = React.createElement("style", {
+      href: cssHash,
+      precedence: "low",
+      dangerouslySetInnerHTML: {
+        __html: createStyleSheet(`css-${cssHash}`, props.css, true),
+      },
+    });
 
     return ReactJSXRuntimeDev.jsxDEV(
       Fragment,
       {
         children: [
-          React.createElement(type, {
-            ...props,
-            key: type,
-            className: `css-${cssHash} ${props.className || ""}`,
-            css: undefined,
-          }),
+          React.createElement(
+            type,
+            {
+              ...props,
+              className: `css-${cssHash} ${props.className || ""}`,
+              css: undefined,
+              children: undefined,
+            },
+            ...(Array.isArray(props.children)
+              ? props.children
+              : [props.children])
+          ),
           style,
         ],
       },
       key,
-      isStaticChildren,
+      true,
       source,
       self
     );
