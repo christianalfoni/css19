@@ -15,6 +15,11 @@ export function jsxDEV(
   self: any
 ): React.JSX.Element {
   if (props.css && typeof type === "string") {
+    /**
+     * During development we'll always generate the hash and style for reconciliation. The reason
+     * is that during development you might be using the React inspector and we want to avoid
+     * flooding it with optimistations in the form of a component (See jsx-runtime.ts)
+     */
     const cssHash = hash(props.css);
     const style = React.createElement(
       "style",

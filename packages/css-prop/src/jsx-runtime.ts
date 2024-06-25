@@ -51,6 +51,13 @@ function CSSElement({
 
 export function jsx(type: any, props: Record<string, any>, key: string) {
   if (props.css && typeof type === "string") {
+    /**
+     * In production we wrap each CSS prop element in a component. This allows us to use
+     * memo hooks to avoid generating the hash or styling unnecessarily. Using React compiler
+     * the CSS prop, if static, will always be memoizable. Also we avoid reconciling the
+     * style tag when the hash is the same. We do not do this during development, as it
+     * creates a lot of additional components in the inspector.
+     */
     return React.createElement(CSSElement, { type, props, key });
   }
 
