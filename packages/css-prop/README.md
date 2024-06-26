@@ -22,6 +22,8 @@ _tsconfig.json_
 
 ## Usage
 
+The CSS object follows the [nested CSS spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Nesting_selector). That means any attributes, pseudos etc. needs to use the `&` to add it to the actual element consuming the style definition.
+
 ```tsx
 function App() {
   return (
@@ -42,6 +44,31 @@ function App() {
 ```
 
 Any element now has a typed `css` property where you can use any kind of CSS selector.
+
+You can define style definitions outside components using the `css` function. This provides typing and you can use the object as an override reference.
+
+```tsx
+import { css } from "@css/css-prop";
+
+const headerCss = css({
+  color: "tomato",
+});
+
+function App() {
+  return (
+    <div
+      css={{
+        [headerCss]: {
+          fontSize: "48px",
+          color: "royalblue",
+        },
+      }}
+    >
+      <h1 css={headerCss}>Hello World</h1>
+    </div>
+  );
+}
+```
 
 ## How it works
 

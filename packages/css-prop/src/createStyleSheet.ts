@@ -2,24 +2,24 @@ import { CSSProp } from "./types";
 
 export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
   let styleSheet = "";
-  let nested = "";
+  let mediaQueries = "";
 
   for (let rule in css) {
     if (rule[0] === "@") {
       // Media queries requires the hash classname to be nested
-      nested += `\n${rule} {\n  .${hash} {\n  ${createStyleSheet(
+      mediaQueries += `\n${rule} {\n  .${hash} {\n  ${createStyleSheet(
         hash,
         css[rule as keyof CSSProp] as CSSProp
-      )}  }\n}`;
+      )}  }\n}\n`;
       continue;
     }
 
     // Generate the nested CSS Props
     if (typeof css[rule as keyof CSSProp] === "object") {
-      nested += `\n.${hash}${rule} {\n${createStyleSheet(
+      styleSheet += `  ${rule} {\n  ${createStyleSheet(
         hash,
         css[rule as keyof CSSProp] as CSSProp
-      )}}`;
+      )}  }\n`;
       continue;
     }
 
@@ -38,5 +38,5 @@ export function createStyleSheet(hash: string, css: CSSProp, isRoot = false) {
     styleSheet += "}\n";
   }
 
-  return styleSheet + nested;
+  return styleSheet + mediaQueries;
 }
