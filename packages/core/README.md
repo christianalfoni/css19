@@ -1,9 +1,9 @@
-# @css19/css-prop
+# @css19/core
 
 ## Intall
 
 ```shell
-npm install @css19/css-prop
+npm install @css19/core
 ```
 
 **NOTE!** Requires React 19
@@ -67,6 +67,30 @@ function App() {
       <h1 css={headerCss}>Hello World</h1>
     </div>
   );
+}
+```
+
+You can also define global css using `globalCss`, which returns a style element you need to mount.
+
+```tsx
+import { globalCss } from "@css/css-prop";
+
+const globalStyle = globalCss({
+  "@keyframes fade": {
+    from: { color: "red" },
+    to: { color: "blue" },
+  },
+});
+
+function App() {
+  return (
+    <>
+      {globalStyle}
+      <div>
+        <h1>Hello World</h1>
+      </div>
+   <>
+  )
 }
 ```
 

@@ -21,6 +21,14 @@ export type CSSProp = Omit<React.CSSProperties, "filter"> & {
   filter?: React.CSSProperties["filter"] | CSSProp;
 };
 
+export type GlobalCSS = {
+  [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProp;
+} & {
+  [Key in `@keyframes ${string}`]: {
+    [percent: string]: React.CSSProperties;
+  };
+};
+
 export declare namespace CSSPropJSX {
   export type Element = React.JSX.Element;
   export type ElementType = React.JSX.ElementType;

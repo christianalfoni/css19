@@ -2,7 +2,7 @@ import * as React from "react";
 import ReactJSXRuntime from "react/jsx-runtime";
 import hash from "hash-sum";
 import { createStyleSheet } from "./createStyleSheet.js";
-export type { CSSPropJSX as JSX } from "./types";
+export type { CSSPropJSX as JSX } from "./types.js";
 
 export const Fragment = ReactJSXRuntime.Fragment;
 
@@ -22,7 +22,7 @@ function CSSElement({
         href: cssHash,
         precedence: "low",
         dangerouslySetInnerHTML: {
-          __html: createStyleSheet(`css-${cssHash}`, props.css, true),
+          __html: createStyleSheet(props.css, `css-${cssHash}`, true),
         },
       }),
     [cssHash]

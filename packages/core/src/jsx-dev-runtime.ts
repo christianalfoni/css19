@@ -27,7 +27,7 @@ export function jsxDEV(
         href: cssHash,
         precedence: "low",
       },
-      createStyleSheet(`css-${cssHash}`, props.css, true)
+      createStyleSheet(props.css, `css-${cssHash}`, true)
     );
 
     return ReactJSXRuntimeDev.jsxDEV(
