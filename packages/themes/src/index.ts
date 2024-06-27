@@ -2,7 +2,7 @@ import * as React from "react";
 
 type Tokens = Record<string, Record<string, string>>;
 
-export function createTokens<
+export function createThemes<
   T extends Tokens,
   TH extends {
     [theme: string]: Partial<{

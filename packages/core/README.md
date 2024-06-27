@@ -58,7 +58,9 @@ function App() {
   return (
     <div
       css={{
-        [headerCss]: {
+        // TypeScript currently does not infer the coercion that happens here. Use
+        // toString(), [`${headerCss}`] or [String(headerCss)] to make TypeScript happy
+        [headerCss.toString()]: {
           fontSize: "48px",
           color: "royalblue",
         },
