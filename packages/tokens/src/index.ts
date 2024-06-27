@@ -2,21 +2,11 @@ import * as React from "react";
 
 type Tokens = Record<string, Record<string, string>>;
 
-export function createTokens<
-  T extends Tokens,
-  TH extends {
-    [theme: string]: Partial<{
-      [K in keyof T]: Partial<T[K]>;
-    }>;
-  }
->({ tokens, themes }: { tokens: T; themes?: TH }) {
+export function createTokens<T extends Tokens>(tokens: T) {
   const tokenVariables = {} as {
     [K in keyof T]: {
       [K2 in keyof T[K]]: string;
     };
-  };
-  const themeClassNames = {} as {
-    [K in keyof TH]: string;
   };
 
   let tokensString = ":root {\n";
@@ -33,37 +23,14 @@ export function createTokens<
 
   tokensString += "}\n\n";
 
-  let themesString = "";
-
-  if (themes) {
-    for (const theme in themes) {
-      const themeClassName = `design-system-theme-${theme}`;
-
-      themeClassNames[theme] = themeClassName;
-      themesString += `.${themeClassName} {\n`;
-      for (const tokenGroup in themes[theme]) {
-        for (const token in themes[theme][tokenGroup]) {
-          themesString += `--${tokenGroup}-${token}: ${
-            themes[theme][tokenGroup]![token]
-          };\n`;
-        }
-      }
-      themesString += "}\n\n";
-    }
-  }
-
   const style = React.createElement(
     "style",
     {
       href: "css-tokens",
       precedence: "low",
     },
-    tokensString + themesString
+    tokensString
   );
 
-  return {
-    tokens: tokenVariables,
-    themes: themeClassNames,
-    style,
-  };
+  return [tokenVariables, style] as const;
 }

@@ -13,21 +13,12 @@ npm install @css19/tokens
 ```tsx
 import { createTokens } from "@css19/tokens";
 
-const { tokens, themes, style } = createTokens({
-  tokens: {
-    colors: {
-      /**
-       * My token documentation
-       */
-      primary: "red",
-    },
-  },
-  themes: {
-    fun: {
-      colors: {
-        primary: "pink",
-      },
-    },
+const [tokens, style] = createTokens({
+  colors: {
+    /**
+     * My token documentation
+     */
+    primary: "red",
   },
 });
 
@@ -43,15 +34,6 @@ function App() {
         >
           Hello World
         </h1>
-        <div className={themes.fun}>
-          <h4
-            style={{
-              color: tokens.colors.primary,
-            }}
-          >
-            The world is a fun place
-          </h4>
-        </div>
       </div>
     </>
   );
@@ -60,8 +42,8 @@ function App() {
 
 ## How it works
 
-The `createTokens` function converts your tokens into CSS variables and themes into CSS variable overrides. The `style` tag is used to mount these variable into your application. This works with client and server.
+The `createTokens` function converts your tokens into CSS variables. The `style` tag is used to mount these variable into your application. This works with client and server.
 
-Using a tokens reference allows you to use TypeScript features like documenting the tokens, finding all tokens by reference and even rename symbol.
+Using a token reference allows you to use TypeScript features like documenting the tokens, finding all tokens by reference and even rename symbol to refactor tokens across your project.
 
 This package can be used with ANY CSS solution in React.

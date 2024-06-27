@@ -1,7 +1,7 @@
 {
-  "name": "@css19/tokens",
-  "version": "0.1.2",
-  "description": "CSS19 - React CSS tokens",
+  "name": "@css19/themes",
+  "version": "0.1.0",
+  "description": "CSS19 - React CSS themes",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
