@@ -48,7 +48,7 @@ Any element now has a typed `css` property where you can use any kind of CSS sel
 You can define style definitions outside components using the `css` function. This provides typing and you can use the object as an override reference.
 
 ```tsx
-import { css } from "@css/css-prop";
+import { css } from "@css19/core";
 
 const headerCss = css({
   color: "tomato",
@@ -73,7 +73,7 @@ function App() {
 You can also define global css using `globalCss`, which returns a style element you need to mount.
 
 ```tsx
-import { globalCss } from "@css/css-prop";
+import { globalCss } from "@css19/core";
 
 const globalStyle = globalCss({
   "@keyframes fade": {
