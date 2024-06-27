@@ -5,38 +5,58 @@ type Tokens = Record<string, Record<string, string>>;
 export function createThemes<
   T extends Tokens,
   TH extends {
-    [theme: string]: Partial<{
+    [key: string]: Partial<{
       [K in keyof T]: Partial<T[K]>;
     }>;
   }
->(tokens: T, themes: TH) {
+>(
+  tokens: T,
+  themes: TH,
+  cb?: (
+    preferred: "dark" | "light",
+    themes: {
+      [K in keyof TH]: string;
+    }
+  ) => string
+) {
   const themeClassNames = {} as {
     [K in keyof TH]: string;
   };
 
   let themesString = "";
 
-  if (themes) {
-    for (const theme in themes) {
-      const themeClassName = `design-system-theme-${theme}`;
+  function addTokens(theme: string) {
+    let tokensString = "";
 
-      themeClassNames[theme] = themeClassName;
-      themesString += `.${themeClassName} {\n`;
-      for (const tokenGroup in themes[theme]) {
-        for (const token in themes[theme][tokenGroup]) {
-          if (!tokens[tokenGroup][token]) {
-            throw new Error(
-              'The token "' + tokenGroup + "." + token + '" does not exist'
-            );
-          }
-
-          themesString += `--${tokenGroup}-${token}: ${
-            themes[theme][tokenGroup]![token]
-          };\n`;
+    for (const tokenGroup in themes[theme]) {
+      for (const token in themes[theme][tokenGroup]) {
+        if (!tokens[tokenGroup][token]) {
+          throw new Error(
+            'The token "' + tokenGroup + "." + token + '" does not exist'
+          );
         }
+
+        tokensString += `  --${tokenGroup}-${token}: ${
+          themes[theme][tokenGroup]![token]
+        };\n`;
       }
-      themesString += "}\n\n";
     }
+
+    if (theme.startsWith("light")) {
+      tokensString += "  color-scheme: light;\n";
+    } else if (theme.startsWith("dark")) {
+      tokensString += "  color-scheme: dark;\n";
+    }
+
+    return tokensString;
+  }
+
+  for (const theme in themes) {
+    const themeClassName = `css-theme-${theme}`;
+
+    themeClassNames[theme] = themeClassName;
+
+    themesString += `.${themeClassName} {\n${addTokens(theme)}}\n\n`;
   }
 
   const style = React.createElement(
@@ -48,5 +68,41 @@ export function createThemes<
     themesString
   );
 
-  return [themeClassNames, style] as const;
+  let children: React.ReactElement = style;
+
+  if (cb) {
+    children = React.createElement(
+      React.Fragment,
+      {},
+      React.createElement(
+        "script",
+        {},
+        `
+ const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
+
+function setClassName(preferred) {
+    const html = document.querySelector("html");
+    const func = new Function(\`return ${cb.toString()}\`)
+    const className = func()(preferred, ${JSON.stringify(themeClassNames)});
+
+    html.className = className;
+}
+
+mediaMatch.addEventListener("change", ({ matches }) => {
+    if (matches) {
+        setClassName("dark");
+    } else {
+        setClassName("light");
+    }
+});
+
+setClassName(mediaMatch.matches ? "dark" : "light");            
+            
+`
+      ),
+      style
+    );
+  }
+
+  return [themeClassNames, children] as const;
 }
