@@ -8,6 +8,8 @@ export function css<T extends CSSProp>(css: T) {
 
   css.toString = () => ".css-" + cssHash;
 
+  // We type this as a string so that you can use the object as keys in other objects.
+  // TypeScript will probably be able to infer this at some point.
   return css as T & { toString(): string } & string;
 }
 
