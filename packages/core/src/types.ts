@@ -42,7 +42,7 @@ export declare namespace CSSPropJSX {
     React.JSX.IntrinsicClassAttributes<T>;
   export type IntrinsicElements = {
     [K in keyof JSX.IntrinsicElements]: React.JSX.IntrinsicElements[K] & {
-      css?: CSSProp;
+      css?: CSSProp | string;
     };
   };
 }

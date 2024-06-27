@@ -18,9 +18,10 @@ export function jsxDEV(
     /**
      * During development we'll always generate the hash and style for reconciliation. The reason
      * is that during development you might be using the React inspector and we want to avoid
-     * flooding it with optimistations in the form of a component (See jsx-runtime.ts)
+     * flooding it with optimistations in the form of a component (See jsx-runtime.ts). When
+     * defined with "css" utility that hash is already generated
      */
-    const cssHash = hash(props.css);
+    const cssHash = props.css.toString ? props.css.toString() : hash(props.css);
     const style = React.createElement(
       "style",
       {

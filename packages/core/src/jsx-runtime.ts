@@ -15,7 +15,10 @@ function CSSElement({
   key?: string;
   type: string;
 }) {
-  const cssHash = React.useMemo(() => hash(props.css), [props.css]);
+  const cssHash = React.useMemo(
+    () => (props.css.toString ? props.css.toString() : hash(props.css)),
+    [props.css]
+  );
   const style = React.useMemo(
     () =>
       React.createElement("style", {

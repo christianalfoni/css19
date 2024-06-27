@@ -3,12 +3,12 @@ import hash from "hash-sum";
 import type { CSSProp, GlobalCSS } from "./types";
 import { createStyleSheet } from "./createStyleSheet.js";
 
-export function css<T extends CSSProp>(css: T): T & { toString(): string } {
+export function css<T extends CSSProp>(css: T) {
   const cssHash = hash(css);
 
   css.toString = () => ".css-" + cssHash;
 
-  return css;
+  return css as T & { toString(): string } & string;
 }
 
 export function globalCss<T extends GlobalCSS>(css: T) {
