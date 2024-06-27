@@ -1,6 +1,6 @@
 import * as React from "react";
 import ReactJSXRuntime from "react/jsx-runtime";
-import hash from "hash-sum";
+import { hash } from "./hash.js";
 import { createStyleSheet } from "./createStyleSheet.js";
 export type { CSSPropJSX as JSX } from "./types.js";
 

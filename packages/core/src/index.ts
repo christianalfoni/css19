@@ -1,7 +1,8 @@
 import * as React from "react";
-import hash from "hash-sum";
+
 import type { CSSProp, GlobalCSS } from "./types";
 import { createStyleSheet } from "./createStyleSheet.js";
+import { hash } from "./hash.js";
 
 export function css<T extends CSSProp>(css: T) {
   // We generate the hash when actually used to avoid situations where

@@ -1,6 +1,6 @@
 {
   "name": "@css19/core",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "CSS19 - React CSS prop",
   "main": "index.js",
   "types": "index.d.ts",
@@ -34,9 +34,6 @@
     "typescript": "^5.5.2",
     "vitest": "^1.6.0"
   },
-  "dependencies": {
-    "hash-sum": "^2.0.0"
-  },
   "files": [
     "createStyleSheet.d.ts",
     "createStyleSheet.js",
@@ -47,6 +44,8 @@
     "index.d.ts",
     "index.js",
     "types.d.ts",
-    "types.js"
+    "types.js",
+    "hash.d.ts",
+    "hash.js"
   ]
 }
