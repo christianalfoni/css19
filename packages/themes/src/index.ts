@@ -17,7 +17,7 @@ export function createThemes<
     themes: {
       [K in keyof TH]: string;
     }
-  ) => string
+  ) => keyof TH
 ) {
   const themeClassNames = {} as {
     [K in keyof TH]: string;
@@ -56,7 +56,9 @@ export function createThemes<
 
     themeClassNames[theme] = themeClassName;
 
-    themesString += `.${themeClassName} {\n${addTokens(theme)}}\n\n`;
+    themesString += `html[data-theme="${themeClassName}"] {\n${addTokens(
+      theme
+    )}}\n\n`;
   }
 
   const style = React.createElement(
@@ -85,7 +87,7 @@ function setClassName(preferred) {
     const func = new Function(\`return ${cb.toString()}\`)
     const className = func()(preferred, ${JSON.stringify(themeClassNames)});
 
-    html.className = className;
+    html.setAttribute("data-theme", className);
 }
 
 mediaMatch.addEventListener("change", ({ matches }) => {
