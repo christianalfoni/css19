@@ -12,7 +12,7 @@ export function createThemes<
 >(
   tokens: T,
   themes: TH,
-  cb?: (
+  cb: (
     preferred: "dark" | "light",
     themes: {
       [K in keyof TH]: string;
@@ -70,16 +70,13 @@ export function createThemes<
     themesString
   );
 
-  let children: React.ReactElement = style;
-
-  if (cb) {
-    children = React.createElement(
-      React.Fragment,
+  const children = React.createElement(
+    React.Fragment,
+    {},
+    React.createElement(
+      "script",
       {},
-      React.createElement(
-        "script",
-        {},
-        `
+      `
  const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
 
 function setClassName(preferred) {
@@ -101,10 +98,9 @@ mediaMatch.addEventListener("change", ({ matches }) => {
 setClassName(mediaMatch.matches ? "dark" : "light");            
             
 `
-      ),
-      style
-    );
-  }
+    ),
+    style
+  );
 
   return [themeClassNames, children] as const;
 }
