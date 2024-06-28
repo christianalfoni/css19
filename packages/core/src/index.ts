@@ -4,6 +4,8 @@ import type { CSSProp, GlobalCSS } from "./types";
 import { createStyleSheet } from "./createStyleSheet.js";
 import { hash } from "./hash.js";
 
+export type { CSSProp, GlobalCSS };
+
 export function css<T extends CSSProp>(css: T): T & { toString(): string } {
   // We generate the hash when actually used to avoid situations where
   // a ton of hashes are generated when booting up the app. It rather
