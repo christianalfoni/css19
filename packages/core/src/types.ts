@@ -15,11 +15,15 @@ type HTMLTagNames = Exclude<keyof JSX.IntrinsicElements, "filter">;
 
 type SelectorString = `${Selectors}${string}`;
 
-export type CSSProp = Omit<React.CSSProperties, "filter"> & {
-  [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProp;
-} & {
-  filter?: React.CSSProperties["filter"] | CSSProp;
+export type CSSSelectors<T> = T & {
+  [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSSelectors<T>;
 };
+
+export type CSSProp = CSSSelectors<
+  Omit<React.CSSProperties, "filter"> & {
+    filter?: React.CSSProperties["filter"] | CSSProp;
+  }
+>;
 
 export type GlobalCSS = {
   [Key in AtRuleString | SelectorString | HTMLTagNames]?: CSSProp;
