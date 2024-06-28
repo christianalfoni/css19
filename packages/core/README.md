@@ -96,6 +96,25 @@ function App() {
 }
 ```
 
+You can also define scoped css using `scopedCss` which gives you the className and related style tag. This is useful when you need to use 3rd party components that does not expose usage of the `css` prop.
+
+```tsx
+import { scopedCss } from "@css19/core";
+
+const [className, style] = scopedCss({
+  color: 'red'
+});
+
+function App() {
+  return (
+    <>
+      {style}
+      <SomeExternalComponent className={className} />
+   <>
+  )
+}
+```
+
 ## How it works
 
 When the `css` prop is active on an element `@css19/core` will create a hash from the object. Order of keys does not matter, if the objects represents the same styling, the hash is the same. By using the new [style tag and hoisting](https://react.dev/reference/react-dom/components/style) feature of React 19, your CSS is will "just work" both client and server side.
