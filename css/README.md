@@ -1,9 +1,9 @@
-# @css19/core
+# @css19/css
 
 ## Intall
 
 ```shell
-npm install @css19/core
+npm install @css19/css
 ```
 
 **NOTE!** Requires React 19
@@ -15,7 +15,7 @@ _tsconfig.json_
 ```json
 {
   "compilerOptions": {
-    "jsxImportSource": "@css19/core"
+    "jsxImportSource": "@css19/css"
   }
 }
 ```
@@ -48,7 +48,7 @@ Any element now has a typed `css` property where you can use any kind of CSS sel
 You can define style definitions outside components using the `css` function. This provides typing and you can use the object as an override reference.
 
 ```tsx
-import { css } from "@css19/core";
+import { css } from "@css19/css";
 
 const headerCss = css({
   color: "tomato",
@@ -60,7 +60,7 @@ function App() {
       css={{
         // TypeScript currently does not infer the coercion that happens here. Use
         // toString(), [`${headerCss}`] or [String(headerCss)] to make TypeScript happy
-        [headerCss.toString()]: {
+        [headerCss]: {
           fontSize: "48px",
           color: "royalblue",
         },
@@ -75,7 +75,7 @@ function App() {
 You can also define global css using `globalCss`, which returns a style element you need to mount.
 
 ```tsx
-import { globalCss } from "@css19/core";
+import { globalCss } from "@css19/css";
 
 const globalStyle = globalCss({
   "@keyframes fade": {
@@ -99,7 +99,7 @@ function App() {
 You can also define scoped css using `scopedCss` which gives you the className and related style tag. This is useful when you need to use 3rd party components that does not expose usage of the `css` prop.
 
 ```tsx
-import { scopedCss } from "@css19/core";
+import { scopedCss } from "@css19/css";
 
 const [className, style] = scopedCss({
   color: 'red'
@@ -117,6 +117,6 @@ function App() {
 
 ## How it works
 
-When the `css` prop is active on an element `@css19/core` will create a hash from the object. Order of keys does not matter, if the objects represents the same styling, the hash is the same. By using the new [style tag and hoisting](https://react.dev/reference/react-dom/components/style) feature of React 19, your CSS is will "just work" both client and server side.
+When the `css` prop is active on an element `@css19/css` will create a hash from the object. Order of keys does not matter, if the objects represents the same styling, the hash is the same. By using the new [style tag and hoisting](https://react.dev/reference/react-dom/components/style) feature of React 19, your CSS is will "just work" both client and server side.
 
 Each element gets only a single CSS classname that references the styling generated related to the element. React 19 automatically de-duplicates styles. This ensures no presedence issues and styling for each element will be co located.
