@@ -6,7 +6,7 @@
 npm install @css19/system-ui-tokens
 ```
 
-**NOTE!** Requires @css19/core
+**NOTE!** Requires @css19/css
 
 ## Configure
 
@@ -15,7 +15,7 @@ import { createTokens } from "@css19/system-ui-tokens";
 
 const [systemUi, tokens, style] = createTokens({
   // These categories maps to specific CSS properties, where
-  // tokens are enforced. See source code for mappings
+  // tokens are enforced. See source code for the specific mappings
   colors: {
     primary: "red",
   },
@@ -33,17 +33,22 @@ const [systemUi, tokens, style] = createTokens({
   borderStyles: {},
 });
 
-const headerCss = systemUi({
-  color: "primary",
-  border: `1px solid ${tokens.colors.primary}`,
-});
-
 function App() {
   return (
     <>
       {style}
       <div>
-        <h1 css={headerCss}>Hello World</h1>
+        <h1
+          css={systemUi({
+            // The mapped tokens ensures type safety and restricts to only using tokens
+            // on mapped CSS properties
+            color: "primary",
+            // You can still use the tokens for manual composition
+            border: `1px solid ${tokens.colors.primary}`,
+          })}
+        >
+          Hello World
+        </h1>
       </div>
     </>
   );
@@ -52,8 +57,6 @@ function App() {
 
 ## How it works
 
-The `createTokens` function converts your tokens into CSS variables. The `style` tag is used to mount these variable into your application. This works with client and server. The `systemUi` function is a wrapper around the `css` function from `@css19/core`, where token values are converted to the respective token variable.
+The `createTokens` function converts your tokens into CSS variables. The `style` tag is used to mount these variable into your application. This works with client and server. The `systemUi` function only translates token values into the respective token variables.
 
-Using a token reference allows you to use TypeScript features like documenting the tokens, finding all tokens by reference and even rename symbol to refactor tokens across your project.
-
-This package can be used with ANY CSS solution in React.
+This package requires `@css19/css`

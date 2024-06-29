@@ -1,4 +1,4 @@
-import { CSSSelectors, css as coreCss } from "@css19/core";
+import type { CSSSelectors } from "@css19/css";
 import { createTokens as baseCreateTokens } from "@css19/tokens";
 
 type SystemUI = {
@@ -360,7 +360,7 @@ export function createTokens<T extends SystemUI>(tokens: T) {
           : {})
     >
   ) {
-    return coreCss(replaceTokens(css, evaluatedTokens));
+    return replaceTokens(css, evaluatedTokens);
   }
 
   return [css, evaluatedTokens, style] as const;
