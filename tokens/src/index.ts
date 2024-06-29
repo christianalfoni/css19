@@ -1,6 +1,6 @@
 import * as React from "react";
 
-type Tokens = Record<string, Record<string, string>>;
+type Tokens = Record<string, Record<string, string | number>>;
 
 export function createTokens<T extends Tokens>(tokens: T) {
   const tokenVariables = {} as {

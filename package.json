@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "workspaces": [
+    "core",
+    "themes",
+    "tokens",
+    "system-ui-tokens"
+  ]
+}

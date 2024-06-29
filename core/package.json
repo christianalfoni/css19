@@ -1,6 +1,6 @@
 {
   "name": "@css19/core",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "CSS19 - React CSS prop",
   "main": "index.js",
   "types": "index.d.ts",

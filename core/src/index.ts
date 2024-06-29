@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { CSSProp, GlobalCSS, CSSSelectors } from "./types";
+import type { CSSProp, GlobalCSS, CSSSelectors } from "./types.js";
 import { createStyleSheet } from "./createStyleSheet.js";
 import { hash } from "./hash.js";
 
@@ -47,7 +47,7 @@ export function scopedCss<T extends CSSProp>(css: T) {
         href: cssHash,
         precedence: "low",
       },
-      createStyleSheet(css, className)
+      createStyleSheet(css, className, true)
     ),
   ] as const;
 }
