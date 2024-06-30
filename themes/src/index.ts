@@ -56,9 +56,7 @@ export function createThemes<
 
     themeClassNames[theme] = themeClassName;
 
-    themesString += `html[data-theme="${themeClassName}"] {\n${addTokens(
-      theme
-    )}}\n\n`;
+    themesString += `.${themeClassName} {\n${addTokens(theme)}}\n\n`;
   }
 
   const style = React.createElement(
