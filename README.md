@@ -2,6 +2,8 @@
 
 A set of utilities to help you build design systems in React 19+. Choose packages just for convencience or get the tools to build a design system for your application.
 
+:warning: **This repository is currently a research project**
+
 ## The motivation
 
 With React 19 we get first class support for style hoisting and de-duplication.
