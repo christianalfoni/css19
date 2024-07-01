@@ -3,7 +3,6 @@
   "workspaces": [
     "css",
     "themes",
-    "tokens",
-    "system-ui-tokens"
+    "system-ui"
   ]
 }

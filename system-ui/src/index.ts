@@ -1,7 +1,6 @@
 import type { CSSSelectors } from "@css19/css";
-import { createTokens as baseCreateTokens } from "@css19/tokens";
 
-type SystemUI = {
+export type SystemUI = {
   colors?: Record<string, string>;
   fonts?: Record<string, string>;
   fontSizes?: Record<string, string | number>;
@@ -180,9 +179,7 @@ function replaceTokens(css: any, tokens: any) {
 }
 
 export function createTokens<T extends SystemUI>(tokens: T) {
-  const [evaluatedTokens, style] = baseCreateTokens(tokens);
-
-  function css(
+  return (
     css: CSSSelectors<
       React.CSSProperties &
         (T["colors"] extends {}
@@ -359,9 +356,5 @@ export function createTokens<T extends SystemUI>(tokens: T) {
             }
           : {})
     >
-  ) {
-    return replaceTokens(css, evaluatedTokens);
-  }
-
-  return [css, evaluatedTokens, style] as const;
+  ) => replaceTokens(css, tokens);
 }

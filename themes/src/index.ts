@@ -1,106 +1,157 @@
 import * as React from "react";
 
-type Tokens = Record<string, Record<string, string | number>>;
+type ThemeValues = Record<string, Record<string, string>>;
 
-export function createThemes<
-  T extends Tokens,
-  TH extends {
-    [key: string]: Partial<{
-      [K in keyof T]: Partial<T[K]>;
-    }>;
-  }
->(
-  tokens: T,
-  themes: TH,
-  cb: (
-    preferred: "dark" | "light",
+type Tokens = Record<string, Record<string, string>>;
+
+type Theme = {
+  colorScheme: ColorScheme;
+  isDefault: boolean;
+  values: ThemeValues;
+};
+
+type ColorScheme = "light" | "dark";
+
+export function ThemesProvider<T extends Record<string, Theme>>({
+  themes,
+  setTheme,
+  children,
+}: {
+  themes: T;
+  setTheme: (
     themes: {
-      [K in keyof TH]: string;
-    }
-  ) => keyof TH
-) {
-  const themeClassNames = {} as {
-    [K in keyof TH]: string;
-  };
+      [K in keyof T]: string;
+    },
+    preferred: ColorScheme
+  ) => string;
+  children: React.ReactNode;
+}) {
+  return React.useMemo(() => {
+    const themeClassNames = {} as any;
 
-  let themesString = "";
+    let themesString = "";
 
-  function addTokens(theme: string) {
-    let tokensString = "";
+    function addTokens(theme: Theme) {
+      let tokensString = "";
 
-    for (const tokenGroup in themes[theme]) {
-      for (const token in themes[theme][tokenGroup]) {
-        if (!tokens[tokenGroup][token]) {
-          throw new Error(
-            'The token "' + tokenGroup + "." + token + '" does not exist'
-          );
+      for (const tokenGroup in theme.values.values) {
+        for (const token in themes.values[tokenGroup]) {
+          tokensString += `  --${tokenGroup}-${token}: ${
+            theme.values[tokenGroup]![token]
+          };\n`;
         }
+      }
 
-        tokensString += `  --${tokenGroup}-${token}: ${
-          themes[theme][tokenGroup]![token]
-        };\n`;
+      if (theme.colorScheme === "light") {
+        tokensString += "  color-scheme: light;\n";
+      } else {
+        tokensString += "  color-scheme: dark;\n";
+      }
+
+      return tokensString;
+    }
+
+    for (const themeName in themes) {
+      const themeClassName = `css-theme-${themeName}`;
+
+      themeClassNames[themeName] = themeClassName;
+
+      const theme = themes[themeName];
+
+      if (theme.isDefault) {
+        themesString += `:root {\n${addTokens(theme)}}\n\n`;
+      } else {
+        themesString += `html[data-theme="${themeClassName}"] {\n${addTokens(
+          theme
+        )}}\n\n`;
       }
     }
 
-    if (theme.startsWith("light")) {
-      tokensString += "  color-scheme: light;\n";
-    } else if (theme.startsWith("dark")) {
-      tokensString += "  color-scheme: dark;\n";
-    }
+    const style = React.createElement(
+      "style",
+      {
+        href: "css-themes",
+        precedence: "low",
+      },
+      themesString
+    );
 
-    return tokensString;
-  }
-
-  for (const theme in themes) {
-    const themeClassName = `css-theme-${theme}`;
-
-    themeClassNames[theme] = themeClassName;
-
-    themesString += `html[data-theme="${themeClassName}"] {\n${addTokens(
-      theme
-    )}}\n\n`;
-  }
-
-  const style = React.createElement(
-    "style",
-    {
-      href: "css-themes",
-      precedence: "low",
-    },
-    themesString
-  );
-
-  const children = React.createElement(
-    React.Fragment,
-    {},
-    React.createElement(
-      "script",
+    return React.createElement(
+      React.Fragment,
       {},
-      `
- const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
-
-function setClassName(preferred) {
-    const html = document.querySelector("html");
-    const func = new Function(\`return ${cb.toString()}\`)
-    const className = func()(preferred, ${JSON.stringify(themeClassNames)});
-
-    html.setAttribute("data-theme", className);
+      React.createElement(
+        "script",
+        {},
+        `
+   const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
+  
+  function setClassName(preferred) {
+      const html = document.querySelector("html");
+      const func = new Function(\`return ${setTheme.toString()}\`)
+      const className = func()(${JSON.stringify(themeClassNames)}, preferred);
+  
+      html.setAttribute("data-theme", className);
+  }
+  
+  mediaMatch.addEventListener("change", ({ matches }) => {
+      if (matches) {
+          setClassName("dark");
+      } else {
+          setClassName("light");
+      }
+  });
+  
+  setClassName(mediaMatch.matches ? "dark" : "light");            
+              
+  `
+      ),
+      style,
+      ...(Array.isArray(children) ? children : [children])
+    );
+  }, Object.values(themes));
 }
 
-mediaMatch.addEventListener("change", ({ matches }) => {
-    if (matches) {
-        setClassName("dark");
-    } else {
-        setClassName("light");
+export function createTheme<T extends ThemeValues>(
+  colorScheme: ColorScheme,
+  themeValues: T
+): [Theme, Tokens];
+export function createTheme<T extends Tokens>(
+  tokens: T,
+  colorScheme: ColorScheme,
+  themeValues: {
+    [K in keyof T]?: {
+      [U in keyof T[K]]?: string;
+    };
+  }
+): Theme;
+export function createTheme(...args: any[]) {
+  if (args.length === 2) {
+    const themeValues = args[1];
+    const tokenVariables = {} as any;
+
+    for (const tokenGroup in themeValues) {
+      for (const token in themeValues[tokenGroup]) {
+        if (!tokenVariables[tokenGroup]) {
+          tokenVariables[tokenGroup] = {} as any;
+        }
+
+        tokenVariables[tokenGroup][token] = `var(--${tokenGroup}-${token})`;
+      }
     }
-});
 
-setClassName(mediaMatch.matches ? "dark" : "light");            
-            
-`
-    ),
-    style
-  );
+    return [
+      {
+        colorScheme: args[0],
+        isDefault: true,
+        values: themeValues,
+      },
+      tokenVariables,
+    ];
+  }
 
-  return [themeClassNames, children] as const;
+  return {
+    colorScheme: args[1],
+    isDefault: false,
+    values: args[2],
+  };
 }
