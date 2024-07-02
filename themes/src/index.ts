@@ -4,6 +4,12 @@ type Variables = Record<string, Record<string, string>>;
 
 type ColorScheme = "light" | "dark";
 
+type Theme = {
+  colorScheme: ColorScheme;
+  variables: Variables;
+  overrides: Variables;
+};
+
 function InlineScript({ id, src }: { id: string; src: string }) {
   const isBrowser = typeof document !== "undefined";
   const hasInjectedScript = isBrowser && document.querySelector("#" + id);
@@ -31,38 +37,10 @@ function InlineScript({ id, src }: { id: string; src: string }) {
   );
 }
 
-export function ThemeProvider({
-  theme,
-  children,
-}: {
-  theme: string;
-  children: React.ReactNode;
-}) {
-  const style = React.useMemo(() => {
-    return React.createElement(
-      "style",
-      {
-        href: "css-themes",
-        precedence: "low",
-      },
-      `:root {
-${theme}
-}`
-    );
-  }, [theme]);
-
-  return React.createElement(
-    React.Fragment,
-    {},
-    style,
-    ...(Array.isArray(children) ? children : [children])
-  );
-}
-
 export type ThemesContext = {
   current: string;
   themes: Record<string, string>;
-  setTheme(): void;
+  update(): void;
 };
 
 const themesContext = React.createContext(null as ThemesContext);
@@ -71,7 +49,12 @@ export function useThemes() {
   return React.useContext(themesContext);
 }
 
-export function ThemesProvider<T extends Record<string, string>>(props: {
+export function ThemesProvider<T extends Record<string, Theme>>({
+  themes,
+  setTheme,
+  children,
+}: {
+  children: React.ReactNode;
   themes: T;
   setTheme: (
     themes: {
@@ -79,26 +62,81 @@ export function ThemesProvider<T extends Record<string, string>>(props: {
     },
     preferred: ColorScheme
   ) => string;
-  children: React.ReactNode;
 }) {
-  function getThemeClassNames() {
-    const themeClassNames = {} as any;
+  const [style, script, value] = React.useMemo(() => {
+    function getThemeClassNames() {
+      const themeClassNames = {} as any;
 
-    for (const theme in props.themes) {
-      const themeClassName = `css-theme-${theme}`;
+      for (const theme in themes) {
+        const themeClassName = `css-theme-${theme}`;
 
-      themeClassNames[theme] = themeClassName;
+        themeClassNames[theme] = themeClassName;
+      }
+
+      return themeClassNames;
     }
 
-    return themeClassNames;
-  }
+    // Since all themes pass in the same default variables, we go through and verify
+    // they are the same and at the same time keep a reference to this singleton
+    let variables;
 
-  const [script, style] = React.useMemo(() => {
+    for (let theme in themes) {
+      if (variables && themes[theme].variables !== variables) {
+        throw new Error(
+          "You have themes that are extending different variables"
+        );
+      }
+      variables = themes[theme].variables;
+    }
+
+    // First we collect all the overrides to identify what variables needs
+    // to be part of all themes and what are considered common variables
+    const allOverrides = {};
+
+    for (let theme in themes) {
+      for (let overrideGroup in themes[theme].overrides) {
+        if (!allOverrides[overrideGroup]) {
+          allOverrides[overrideGroup] = {};
+        }
+        for (let override in themes[theme].overrides[overrideGroup]) {
+          allOverrides[overrideGroup][override] = true;
+        }
+      }
+    }
+
+    let commonVariables = ":root {\n";
+
+    for (let variableGroup in variables) {
+      for (let variable in variables[variableGroup]) {
+        if (allOverrides[variableGroup]?.[variable]) {
+          continue;
+        }
+
+        commonVariables += `  --${variableGroup}-${variable}: ${variables[variableGroup][variable]};\n`;
+      }
+    }
+
+    commonVariables += "}\n\n";
+
     const themeClassNames = getThemeClassNames();
-    let themesString = "";
+    let themeVariables = "";
 
-    for (const theme in themeClassNames) {
-      themesString += `html[data-css-theme="${themeClassNames[theme]}"], .${themeClassNames[theme]} {\n  ${props.themes[theme]}}\n\n`;
+    for (let theme in themes) {
+      // We always add the theme CSS with the color scheme and potentially any overrides
+      themeVariables += `html[data-css-theme="${themeClassNames[theme]}"], .${themeClassNames[theme]} {
+  color-scheme: ${themes[theme].colorScheme};\n`;
+      // We go through all variables that is overridden
+      for (let overrideGroup in allOverrides) {
+        for (let override in allOverrides[overrideGroup]) {
+          // Then we choose the specific override for this theme, or grab it from the default variables. This
+          // prevents an active theme with a certain override to override the defaults when nesting a theme override
+          themeVariables += `  --${overrideGroup}-${override}: ${
+            themes[theme].overrides[overrideGroup]?.[override] ??
+            variables[overrideGroup][override]
+          };\n`;
+        }
+      }
+      themeVariables += "}\n\n";
     }
 
     const style = React.createElement(
@@ -107,7 +145,7 @@ export function ThemesProvider<T extends Record<string, string>>(props: {
         href: "css-themes",
         precedence: "low",
       },
-      themesString
+      commonVariables + themeVariables
     );
 
     const script = React.createElement(InlineScript, {
@@ -116,7 +154,7 @@ export function ThemesProvider<T extends Record<string, string>>(props: {
 
 function setClassName(preferred) {
     const html = document.querySelector("html");
-    const func = new Function(\`return ${props.setTheme.toString()}\`)
+    const func = new Function(\`return ${setTheme.toString()}\`)
     const theme = func()(${JSON.stringify(themeClassNames)}, preferred);
 
     html.setAttribute("data-css-theme", theme);
@@ -134,88 +172,74 @@ setClassName(mediaMatch.matches ? "dark" : "light");
 `,
     });
 
-    return [script, style];
-  }, Object.values(props.themes));
-
-  return React.createElement(
-    themesContext.Provider,
-    {
-      value: {
+    return [
+      style,
+      script,
+      {
         get current() {
           return document.querySelector("html").getAttribute("data-css-theme");
         },
         get themes() {
           return getThemeClassNames();
         },
-        setTheme() {
+        update() {
           const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
 
-          props.setTheme(
-            getThemeClassNames(),
-            mediaMatch.matches ? "dark" : "light"
-          );
+          setTheme(getThemeClassNames(), mediaMatch.matches ? "dark" : "light");
         },
       },
+    ] as const;
+  }, []);
+
+  return React.createElement(
+    themesContext.Provider,
+    {
+      value,
     },
     style,
     script,
-    ...(Array.isArray(props.children) ? props.children : [props.children])
+    ...(Array.isArray(children) ? children : [children])
   );
 }
 
-export function createTheme<T extends Variables>(
-  colorScheme: ColorScheme,
-  variables: T
-): [string, T];
-export function createTheme<T extends Variables>(
-  fromVariables: T,
-  colorScheme: ColorScheme,
-  variables: {
-    [K in keyof T]?: {
-      [U in keyof T[K]]?: string;
+export function createThemes<T extends Variables>(
+  variables: T,
+  themes: {
+    [theme: string]: {
+      colorScheme: ColorScheme;
+    } & {
+      [K in keyof T]?: {
+        [U in keyof T[K]]?: string;
+      };
     };
   }
-): string;
-export function createTheme(...args: any[]) {
-  if (args.length === 2) {
-    const colorScheme = args[0];
-    const variables = args[1];
-    const variableReferences = {} as any;
-
-    let css = `color-scheme: ${colorScheme};\n`;
-
-    for (const variableGourp in variables) {
-      for (const variable in variables[variableGourp]) {
-        if (!variableReferences[variableGourp]) {
-          variableReferences[variableGourp] = {} as any;
-        }
-        variableReferences[variableGourp][
-          variable
-        ] = `var(--${variableGourp}-${variable})`;
-        css += `--${variableGourp}-${variable}: ${variables[variableGourp][variable]};\n`;
-      }
-    }
-
-    return [css, variableReferences];
-  }
-
-  const variablesFrom = args[0];
-  const colorScheme = args[1];
-  const variables = args[2];
-
-  let css = `color-scheme: ${colorScheme};\n`;
+): [Record<string, Theme>, T] {
+  const variableReferences = {} as any;
 
   for (const variableGroup in variables) {
     for (const variable in variables[variableGroup]) {
-      if (!variablesFrom[variableGroup][variable]) {
-        throw new Error(
-          'The variable "' + variableGroup + "." + variable + '" does not exist'
-        );
+      if (!variableReferences[variableGroup]) {
+        variableReferences[variableGroup] = {} as any;
       }
-
-      css += `--${variableGroup}-${variable}: ${variables[variableGroup][variable]};\n`;
+      variableReferences[variableGroup][
+        variable
+      ] = `var(--${variableGroup}-${variable})`;
     }
   }
 
-  return css;
+  const themeReferences = {} as any;
+
+  for (let theme in themes) {
+    const colorScheme = themes[theme].colorScheme;
+
+    delete themes[theme].colorScheme;
+
+    themeReferences[theme] = {
+      colorScheme,
+      variables,
+      overrides: themes[theme],
+    };
+  }
+
+  return [themeReferences, variableReferences];
 }

@@ -2,18 +2,24 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import { globalStyle } from "./globalCss";
-import { ThemesProvider, createTheme } from "@css19/themes";
+import { ThemesProvider, createThemes } from "@css19/themes";
 import { css } from "@css19/css";
 
-const [light, variables] = createTheme("light", {
+const tokens = {
   colors: {
     primary: "royalblue",
   },
-});
+};
 
-const dark = createTheme(variables, "dark", {
-  colors: {
-    primary: "yellow",
+const [themes, variables] = createThemes(tokens, {
+  light: {
+    colorScheme: "light",
+  },
+  dark: {
+    colorScheme: "dark",
+    colors: {
+      primary: "yellow",
+    },
   },
 });
 
@@ -29,7 +35,7 @@ function App() {
 
   return (
     <ThemesProvider
-      themes={{ dark, light }}
+      themes={themes}
       setTheme={(themes, preferred) => themes[preferred]}
     >
       {globalStyle}

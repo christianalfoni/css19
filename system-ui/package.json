@@ -33,9 +33,7 @@
     "react": "^18.3.1",
     "typescript": "^5.5.2"
   },
-  "dependencies": {
-    "@css19/css": "*"
-  },
+  "dependencies": {},
   "files": [
     "dist"
   ]
