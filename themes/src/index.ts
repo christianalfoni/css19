@@ -1,22 +1,77 @@
 import * as React from "react";
 
-type ThemeValues = Record<string, Record<string, string>>;
-
-type Tokens = Record<string, Record<string, string>>;
-
-type Theme = {
-  colorScheme: ColorScheme;
-  isDefault: boolean;
-  values: ThemeValues;
-};
+type Variables = Record<string, Record<string, string>>;
 
 type ColorScheme = "light" | "dark";
 
-export function ThemesProvider<T extends Record<string, Theme>>({
-  themes,
-  setTheme,
+function InlineScript({ id, src }: { id: string; src: string }) {
+  const isBrowser = typeof document !== "undefined";
+  const hasInjectedScript = isBrowser && document.querySelector("#" + id);
+  const wasScriptInjected = React.useRef(hasInjectedScript);
+
+  // With server side rendering we will get an executable inline script,
+  // but when only rendering on client that script will not execute.
+  if (isBrowser && !wasScriptInjected.current) {
+    if (!hasInjectedScript) {
+      const script = document.createElement("script");
+      script.innerHTML = src;
+      script.id = id;
+      document.head.appendChild(script);
+    }
+
+    return null;
+  }
+
+  return React.createElement(
+    "script",
+    {
+      id,
+    },
+    src
+  );
+}
+
+export function ThemeProvider({
+  theme,
   children,
 }: {
+  theme: string;
+  children: React.ReactNode;
+}) {
+  const style = React.useMemo(() => {
+    return React.createElement(
+      "style",
+      {
+        href: "css-themes",
+        precedence: "low",
+      },
+      `:root {
+${theme}
+}`
+    );
+  }, [theme]);
+
+  return React.createElement(
+    React.Fragment,
+    {},
+    style,
+    ...(Array.isArray(children) ? children : [children])
+  );
+}
+
+export type ThemesContext = {
+  current: string;
+  themes: Record<string, string>;
+  setTheme(): void;
+};
+
+const themesContext = React.createContext(null as ThemesContext);
+
+export function useThemes() {
+  return React.useContext(themesContext);
+}
+
+export function ThemesProvider<T extends Record<string, string>>(props: {
   themes: T;
   setTheme: (
     themes: {
@@ -26,45 +81,24 @@ export function ThemesProvider<T extends Record<string, Theme>>({
   ) => string;
   children: React.ReactNode;
 }) {
-  return React.useMemo(() => {
+  function getThemeClassNames() {
     const themeClassNames = {} as any;
 
-    let themesString = "";
+    for (const theme in props.themes) {
+      const themeClassName = `css-theme-${theme}`;
 
-    function addTokens(theme: Theme) {
-      let tokensString = "";
-
-      for (const tokenGroup in theme.values.values) {
-        for (const token in themes.values[tokenGroup]) {
-          tokensString += `  --${tokenGroup}-${token}: ${
-            theme.values[tokenGroup]![token]
-          };\n`;
-        }
-      }
-
-      if (theme.colorScheme === "light") {
-        tokensString += "  color-scheme: light;\n";
-      } else {
-        tokensString += "  color-scheme: dark;\n";
-      }
-
-      return tokensString;
+      themeClassNames[theme] = themeClassName;
     }
 
-    for (const themeName in themes) {
-      const themeClassName = `css-theme-${themeName}`;
+    return themeClassNames;
+  }
 
-      themeClassNames[themeName] = themeClassName;
+  const [script, style] = React.useMemo(() => {
+    const themeClassNames = getThemeClassNames();
+    let themesString = "";
 
-      const theme = themes[themeName];
-
-      if (theme.isDefault) {
-        themesString += `:root {\n${addTokens(theme)}}\n\n`;
-      } else {
-        themesString += `html[data-theme="${themeClassName}"] {\n${addTokens(
-          theme
-        )}}\n\n`;
-      }
+    for (const theme in themeClassNames) {
+      themesString += `html[data-css-theme="${themeClassNames[theme]}"], .${themeClassNames[theme]} {\n  ${props.themes[theme]}}\n\n`;
     }
 
     const style = React.createElement(
@@ -76,82 +110,112 @@ export function ThemesProvider<T extends Record<string, Theme>>({
       themesString
     );
 
-    return React.createElement(
-      React.Fragment,
-      {},
-      React.createElement(
-        "script",
-        {},
-        `
-   const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
-  
-  function setClassName(preferred) {
-      const html = document.querySelector("html");
-      const func = new Function(\`return ${setTheme.toString()}\`)
-      const className = func()(${JSON.stringify(themeClassNames)}, preferred);
-  
-      html.setAttribute("data-theme", className);
-  }
-  
-  mediaMatch.addEventListener("change", ({ matches }) => {
-      if (matches) {
-          setClassName("dark");
-      } else {
-          setClassName("light");
-      }
-  });
-  
-  setClassName(mediaMatch.matches ? "dark" : "light");            
-              
-  `
-      ),
-      style,
-      ...(Array.isArray(children) ? children : [children])
-    );
-  }, Object.values(themes));
+    const script = React.createElement(InlineScript, {
+      id: "css-media-watcher",
+      src: `const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
+
+function setClassName(preferred) {
+    const html = document.querySelector("html");
+    const func = new Function(\`return ${props.setTheme.toString()}\`)
+    const theme = func()(${JSON.stringify(themeClassNames)}, preferred);
+
+    html.setAttribute("data-css-theme", theme);
 }
 
-export function createTheme<T extends ThemeValues>(
+mediaMatch.addEventListener("change", ({ matches }) => {
+    if (matches) {
+        setClassName("dark");
+    } else {
+        setClassName("light");
+    }
+});
+
+setClassName(mediaMatch.matches ? "dark" : "light");            
+`,
+    });
+
+    return [script, style];
+  }, Object.values(props.themes));
+
+  return React.createElement(
+    themesContext.Provider,
+    {
+      value: {
+        get current() {
+          return document.querySelector("html").getAttribute("data-css-theme");
+        },
+        get themes() {
+          return getThemeClassNames();
+        },
+        setTheme() {
+          const mediaMatch = window.matchMedia("(prefers-color-scheme: dark)");
+
+          props.setTheme(
+            getThemeClassNames(),
+            mediaMatch.matches ? "dark" : "light"
+          );
+        },
+      },
+    },
+    style,
+    script,
+    ...(Array.isArray(props.children) ? props.children : [props.children])
+  );
+}
+
+export function createTheme<T extends Variables>(
   colorScheme: ColorScheme,
-  themeValues: T
-): [Theme, Tokens];
-export function createTheme<T extends Tokens>(
-  tokens: T,
+  variables: T
+): [string, T];
+export function createTheme<T extends Variables>(
+  fromVariables: T,
   colorScheme: ColorScheme,
-  themeValues: {
+  variables: {
     [K in keyof T]?: {
       [U in keyof T[K]]?: string;
     };
   }
-): Theme;
+): string;
 export function createTheme(...args: any[]) {
   if (args.length === 2) {
-    const themeValues = args[1];
-    const tokenVariables = {} as any;
+    const colorScheme = args[0];
+    const variables = args[1];
+    const variableReferences = {} as any;
 
-    for (const tokenGroup in themeValues) {
-      for (const token in themeValues[tokenGroup]) {
-        if (!tokenVariables[tokenGroup]) {
-          tokenVariables[tokenGroup] = {} as any;
+    let css = `color-scheme: ${colorScheme};\n`;
+
+    for (const variableGourp in variables) {
+      for (const variable in variables[variableGourp]) {
+        if (!variableReferences[variableGourp]) {
+          variableReferences[variableGourp] = {} as any;
         }
-
-        tokenVariables[tokenGroup][token] = `var(--${tokenGroup}-${token})`;
+        variableReferences[variableGourp][
+          variable
+        ] = `var(--${variableGourp}-${variable})`;
+        css += `--${variableGourp}-${variable}: ${variables[variableGourp][variable]};\n`;
       }
     }
 
-    return [
-      {
-        colorScheme: args[0],
-        isDefault: true,
-        values: themeValues,
-      },
-      tokenVariables,
-    ];
+    return [css, variableReferences];
   }
 
-  return {
-    colorScheme: args[1],
-    isDefault: false,
-    values: args[2],
-  };
+  const variablesFrom = args[0];
+  const colorScheme = args[1];
+  const variables = args[2];
+
+  let css = `color-scheme: ${colorScheme};\n`;
+
+  for (const variableGroup in variables) {
+    for (const variable in variables[variableGroup]) {
+      if (!variablesFrom[variableGroup][variable]) {
+        throw new Error(
+          'The variable "' + variableGroup + "." + variable + '" does not exist'
+        );
+      }
+
+      css += `--${variableGroup}-${variable}: ${variables[variableGroup][variable]};\n`;
+    }
+  }
+
+  return css;
 }

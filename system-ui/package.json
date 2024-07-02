@@ -1,6 +1,6 @@
 {
   "name": "@css19/system-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CSS19 - React CSS system-ui",
   "type": "module",
   "main": "dist/index.js",
@@ -34,7 +34,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "@css19/css": "^0.1.0"
+    "@css19/css": "*"
   },
   "files": [
     "dist"

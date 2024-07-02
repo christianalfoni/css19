@@ -1,5 +1,5 @@
 import * as React from "react";
-import ReactJSXRuntimeDev from "react/jsx-dev-runtime.js";
+import ReactJSXRuntimeDev from "react/jsx-dev-runtime";
 import { createStyleSheet } from "./createStyleSheet.js";
 import { hash } from "./hash.js";
 

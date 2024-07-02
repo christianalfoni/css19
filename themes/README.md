@@ -10,75 +10,80 @@ npm install @css19/themes
 
 ## Configure
 
-```tsx
-import { createThemes } from "@css19/themes";
-import { tokens } from "./tokens";
-
-const [themes, themesProvider] = createThemes(
-  // Pass tokens from any tokens package
-  tokens,
-  // Define your theme overrides
-  {
-    light: {
-      colors: {
-        primary: "pink",
-      },
-    },
-    dark: {
-      colors: {
-        primary: "blue",
-      },
-    },
-  },
-  // Return the theme you want to activate globally. Here you can also choose any
-  // theme you stored in local storage for example
-  (systemPreference, themes) => themes[systemPreference]
-);
-```
-
-Theme names prefixed with `light` or `dark` will also get the related color scheme. This will allow you to use `light-dark(A, B)` utility in your CSS. The returned `themes` can be used to change themes in certain parts of the component tree.
+### Single theme
 
 ```tsx
-import { createThemes } from "@css19/themes";
-import { tokens } from "./tokens";
+import { createTheme, ThemeProvider } from "@css19/themes";
 
-const [themes, themesProvider] = createThemes(
-  tokens,
-  {
-    light: {
-      colors: {
-        primary: "pink",
-      },
-    },
-    dark: {
-      colors: {
-        primary: "blue",
-      },
-    },
+const [myTheme, variables] = createTheme("light", {
+  // Define a group of variables
+  colors: {
+    // Name your variables and give a value
+    primary: "pink",
   },
-  (preferred, themes) => themes[preferred]
-);
+});
 
 function App() {
   return (
-    <>
-      {themesProvider}
-      <h1
-        css={{
-          color: tokens.colors.primary,
-          textDecoration: "light-dark(underline, none)",
-        }}
-      >
-        Hello World
-      </h1>
-      <div className={themes.dark}>Hello dark</div>
-    </>
+    // Mount your theme to start using your variables
+    <ThemeProvider theme={myTheme}>
+      <h1 style={{ color: variables.colors.primary }}>Hello World</h1>
+    </ThemeProvider>
   );
 }
 ```
 
+### Multiple themes
+
+```tsx
+import { createTheme, ThemesProvider, useThemes } from "@css19/themes";
+
+const [light, variables] = createTheme("light", {
+  colors: {
+    primary: "pink",
+  },
+});
+
+const dark = createTheme(variables, "dark", {
+  colors: {
+    primary: "royalblue",
+  },
+});
+
+function App() {
+  return (
+    <ThemesProvider
+      // Mount the themes
+      themes={{ light, dark }}
+      // This callback runs in an isolated script tag scope to ensure the theme is
+      // activated before your app mounts. Use the themes, preferred system preference of
+      // "light" or "dark" or local storage, to decide what theme to activate. This callback runs again
+      // if system preference changes or using the "useThemes" hook
+      setTheme={(themes, preferred) => themes[preferred]}
+    >
+      <h1 style={{ color: variables.colors.primary }}>Hello World</h1>
+      <SomeNestedComponent />
+    </ThemesProvider>
+  );
+}
+
+function SomeNestedComponent() {
+  const themes = useThemes();
+
+  return (
+    // Override theme in a section of the page
+    <div className={themes.themes.dark}>
+      <h2>Current theme is: {themes.current}</2>
+      <button onClick={() => themes.setTheme()}>Update theme</button>
+    </div>
+  );
+}
+```
+
+**Note!** Calling `themes.setTheme` will run the `setTheme` callback of the provider again. That means you will need to provide the updated theme through local storage etc.
+
 ## How it works
 
-The `createThemes` function takes tokens and generates variable overrides for the defined themes. The `themesProvider` is used to mount these variable overrides and the related JavaScript to configure your global style based on system preferences. This works with client and server. Any `light` or `dark` prefix will also add the `color-scheme` property for usage with the `light-dark()` CSS utility.
+The `createTheme` function takes tokens and generates variable overrides for the defined themes. The theme providers is used to mount these variable overrides. This works with client and server. With multiple themes you will be able to activate the current theme based on system preference or any other reference you customise. Using the `light` and `dark` color scheme allows for usage of the `light-dark()` CSS utility.
 
 This package can be used with ANY CSS solution in React.

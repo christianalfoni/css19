@@ -3,6 +3,8 @@
   "workspaces": [
     "css",
     "themes",
-    "system-ui"
+    "system-ui",
+    "demo-client",
+    "demo-client-server"
   ]
 }
