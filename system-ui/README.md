@@ -11,9 +11,10 @@ npm install @css19/system-ui-tokens
 ## Configure
 
 ```tsx
-import { createTokens } from "@css19/system-ui-tokens";
+import { createTheme, ThemeProvider } from "@css19/themes";
+import { createSystemUi } from "@css19/system-ui";
 
-const [systemUi, tokens, style] = createTokens({
+const [systemUi, tokens] = createSystemUi({
   // These categories maps to specific CSS properties, where
   // tokens are enforced. See source code for the specific mappings
   colors: {
@@ -33,24 +34,25 @@ const [systemUi, tokens, style] = createTokens({
   borderStyles: {},
 });
 
+const [theme, variables] = createTheme("light", tokens);
+
 function App() {
   return (
-    <>
-      {style}
+    <ThemeProvider theme={theme}>
       <div>
         <h1
-          css={systemUi({
-            // The mapped tokens ensures type safety and restricts to only using tokens
+          style={systemUi({
+            // The mapped tokens ensures type safety and restricts to only using variables
             // on mapped CSS properties
             color: "primary",
-            // You can still use the tokens for manual composition
-            border: `1px solid ${tokens.colors.primary}`,
+            // You can still use the variables for manual composition
+            border: `1px solid ${variables.colors.primary}`,
           })}
         >
           Hello World
         </h1>
       </div>
-    </>
+    </ThemeProvider>
   );
 }
 ```

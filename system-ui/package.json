@@ -1,7 +1,7 @@
 {
-  "name": "@css19/tokens",
+  "name": "@css19/system-ui",
   "version": "0.1.2",
-  "description": "CSS19 - React CSS tokens",
+  "description": "CSS19 - React CSS system-ui",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,7 +33,9 @@
     "react": "^18.3.1",
     "typescript": "^5.5.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@css19/css": "*"
+  },
   "files": [
     "dist"
   ]

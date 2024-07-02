@@ -1,6 +1,6 @@
 {
   "name": "@css19/themes",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "CSS19 - React CSS themes",
   "type": "module",
   "main": "dist/index.js",
