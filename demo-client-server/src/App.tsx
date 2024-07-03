@@ -2,7 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import { globalStyle } from "./globalCss";
-import { ThemesProvider, createThemes } from "@css19/themes";
+import { createTheme, createThemesProvider } from "@css19/themes";
 import { css } from "@css19/css";
 
 const tokens = {
@@ -11,17 +11,17 @@ const tokens = {
   },
 };
 
-const [themes, variables] = createThemes(tokens, {
-  light: {
-    colorScheme: "light",
-  },
-  dark: {
-    colorScheme: "dark",
-    colors: {
-      primary: "yellow",
-    },
+const light = createTheme("light", tokens, {});
+const dark = createTheme("dark", tokens, {
+  colors: {
+    primary: "yellow",
   },
 });
+
+const [variables, ThemesProvider] = createThemesProvider(
+  { light, dark },
+  (themes, preferred) => themes[preferred]
+);
 
 const logoCss = css({
   height: "6em",
@@ -34,10 +34,7 @@ function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <ThemesProvider
-      themes={themes}
-      setTheme={(themes, preferred) => themes[preferred]}
-    >
+    <ThemesProvider>
       {globalStyle}
       <div>
         <a href="https://vitejs.dev" target="_blank">
