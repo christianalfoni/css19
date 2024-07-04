@@ -16,9 +16,8 @@ Read more about how [@css19/css]('./css/README.md) works and explore related pac
 ## Utilites
 
 - [@css19/css](./css) - Enables the css property with related utilities
-- [@css19/tokens]('./tokens') - Generate typed CSS variables from tokens
 - [@css19/themes]('./themes') - Generate themes with support for system preferences
 
 **Alternative packages**
 
-- [@css19/system-ui-tokens]('./system-ui-tokens') - Map system UI tokens to typed CSS properties
+- [@css19/system-ui]('./system-ui') - Map system UI tokens to typed CSS properties
