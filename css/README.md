@@ -22,6 +22,8 @@ _tsconfig.json_
 
 ## Usage
 
+### CSS Prop
+
 The CSS object follows the [nested CSS spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Nesting_selector). That means any attributes, pseudos etc. needs to use the `&` to add it to the actual element consuming the style definition.
 
 ```tsx
@@ -44,6 +46,8 @@ function App() {
 ```
 
 Any element now has a typed `css` property where you can use any kind of CSS selector.
+
+### Css
 
 You can define style definitions outside components using the `css` function. This provides typing and you can use the object as an override reference.
 
@@ -72,6 +76,8 @@ function App() {
 }
 ```
 
+### Global CSS
+
 You can also define global css using `globalCss`, which returns a style element you need to mount.
 
 ```tsx
@@ -96,6 +102,8 @@ function App() {
 }
 ```
 
+### Scoped CSS
+
 You can also define scoped css using `scopedCss` which gives you the className and related style tag. This is useful when you need to use 3rd party components that does not expose usage of the `css` prop.
 
 ```tsx
@@ -110,6 +118,31 @@ function App() {
     <>
       {style}
       <SomeExternalComponent className={className} />
+   <>
+  )
+}
+```
+
+### Variables
+
+When working with CSS it can be good to create some constraints. You can mount variables that you can consume in your components to follow these constraints. If you are looking into multiple themes and/or dealing with light and dark color schemes, check out [@css19/themes](../themes/).
+
+```tsx
+import { createVariables } from "@css19/css";
+
+const [variables, style] = createVariables({
+  colors: {
+    primary: 'red'
+  }
+});
+
+function App() {
+  return (
+    <>
+      {style}
+      <h1 css={{
+        color: variables.colors.primary
+      }}>Hello World</h1>
    <>
   )
 }

@@ -51,3 +51,43 @@ export function scopedCss<T extends CSSProp>(css: T) {
     ),
   ] as const;
 }
+
+export type Variables = Record<string, Record<string, string>>;
+
+export function createVariables<T extends Variables>(
+  variables: T
+): [T, React.ReactNode] {
+  const variableReferences = {} as any;
+
+  for (const variableGroup in variables) {
+    for (const variable in variables[variableGroup]) {
+      if (!variableReferences[variableGroup]) {
+        variableReferences[variableGroup] = {} as any;
+      }
+      variableReferences[variableGroup][
+        variable
+      ] = `var(--${variableGroup}-${variable})`;
+    }
+  }
+
+  let rootVariables = ":root {\n";
+
+  for (let variableGroup in variables) {
+    for (let variable in variables[variableGroup]) {
+      rootVariables += `  --${variableGroup}-${variable}: ${variables[variableGroup][variable]};\n`;
+    }
+  }
+
+  rootVariables += "}\n";
+
+  const style = React.createElement(
+    "style",
+    {
+      href: "css-variables",
+      precedence: "low",
+    },
+    rootVariables
+  );
+
+  return [variableReferences, style];
+}

@@ -45,58 +45,6 @@ export type ThemesContext = {
 
 const themesContext = React.createContext(null as ThemesContext);
 
-export function createThemeProvider<T extends Theme>(theme: T) {
-  const variableReferences = {} as any;
-
-  for (const variableGroup in theme.variables) {
-    for (const variable in theme.variables[variableGroup]) {
-      if (!variableReferences[variableGroup]) {
-        variableReferences[variableGroup] = {} as any;
-      }
-      variableReferences[variableGroup][
-        variable
-      ] = `var(--${variableGroup}-${variable})`;
-    }
-  }
-
-  function ThemesProvider({ children }) {
-    const style = React.useMemo(() => {
-      let rootVariables = ":root {\n";
-
-      for (let variableGroup in theme.variables) {
-        for (let variable in theme.variables[variableGroup]) {
-          rootVariables += `  --${variableGroup}-${variable}: ${
-            theme.overrides[variableGroup]?.[variable] ??
-            theme.variables[variableGroup][variable]
-          };\n`;
-        }
-      }
-
-      rootVariables += "}\n";
-
-      return React.createElement(
-        "style",
-        {
-          href: "css-theme",
-          precedence: "low",
-        },
-        rootVariables
-      );
-    }, []);
-
-    return React.createElement(
-      React.Fragment,
-      {},
-      style,
-      ...(Array.isArray(children) ? children : [children])
-    );
-  }
-
-  return [variableReferences, ThemesProvider] as [
-    T["variables"],
-    React.FunctionComponent<{ children: React.ReactNode }>
-  ];
-}
 export function createThemesProvider<T extends Record<string, Theme>>(
   themes: T,
   setTheme: (

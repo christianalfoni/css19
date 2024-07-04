@@ -10,32 +10,6 @@ npm install @css19/themes
 
 ## Configure
 
-### Single theme consumption
-
-```tsx
-import { createTheme, createThemeProvider } from "@css19/themes";
-
-const tokens = {
-  colors: {
-    primary: "red",
-  },
-};
-
-const theme = createTheme("light", tokens, {});
-
-const [variables, ThemeProvider] = createThemeProvider(theme);
-
-function App() {
-  return (
-    <ThemeProvider>
-      <h1 style={{ color: variables.colors.primary }}>Hello World</h1>
-    </ThemeProvider>
-  );
-}
-```
-
-### Multi theme consumption
-
 ```tsx
 import { createTheme, createThemesProvider } from '@css19/themes'
 
