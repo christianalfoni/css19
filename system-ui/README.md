@@ -42,7 +42,7 @@ function App() {
       {style}
       <div>
         <h1
-          style={systemUi({
+          css={systemUi({
             // The mapped tokens ensures type safety and restricts to only using variables
             // on mapped CSS properties
             color: "primary",
@@ -60,6 +60,6 @@ function App() {
 
 ## How it works
 
-The `createTokens` function converts your tokens into CSS variables. The `style` tag is used to mount these variable into your application. This works with client and server. The `systemUi` function only translates token values into the respective token variables.
+The `createSystemUi` function allows you to configure your system-ui tokens. It returns a function which restricts related CSS properties to your tokens and the tokens themselves.
 
 This package requires `@css19/css`
