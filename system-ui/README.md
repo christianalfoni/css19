@@ -11,7 +11,7 @@ npm install @css19/system-ui-tokens
 ## Configure
 
 ```tsx
-import { createTheme, ThemeProvider } from "@css19/themes";
+import { createTheme, createThemeProvider } from "@css19/themes";
 import { createSystemUi } from "@css19/system-ui";
 
 const [systemUi, tokens] = createSystemUi({
@@ -34,11 +34,12 @@ const [systemUi, tokens] = createSystemUi({
   borderStyles: {},
 });
 
-const [theme, variables] = createTheme("light", tokens);
+const theme = createTheme("light", tokens);
+const [variables, ThemeProvider] = createThemeProvider(theme);
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <div>
         <h1
           style={systemUi({
